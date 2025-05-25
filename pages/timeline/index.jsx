@@ -1,10 +1,15 @@
 import Link from "next/link";
-
-export default function Timeline() {
+import AppLayout from "../../Components/AppLayout/AppLayout";
+export default function Timeline({username}) {
   return (
-    <div>
-      <h1>This is the timeline</h1> 
+    <AppLayout>
+      <h1>This is the timeline of {username}</h1> 
       <Link href="/"> <a>Go to home</a></Link>
-    </div>
+    </AppLayout>
   )
+}
+
+Timeline.getInitialProps = async () => {
+  
+  return {username : "Sergio"}
 }

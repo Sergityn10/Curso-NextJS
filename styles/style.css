@@ -1,0 +1,12 @@
+body{
+    background-image: radial-gradient(#09f, 1px, transparent, 1px), radial-gradient()
+    background-size: 20px 20px;
+    background-color: #000;
+}
+
+@media screen and (max-width: 600px) {
+    body {
+        background-size: 10px 10px;
+    }
+    
+}
