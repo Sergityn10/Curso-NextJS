@@ -4,17 +4,46 @@ import AppLayout from "../Components/AppLayout/AppLayout";
 import { colors } from "../styles/theme";
 import Button from "../Components/Button";
 import Github from "../Components/Icons/Github";
+
+import { loginWithGithub, onAuthStateChangedOwn } from "../firebase/client";
+import { useEffect, useState } from "react";
+import { on } from "events";
 export default function Home() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    onAuthStateChangedOwn(setUser)
+  }, []);
+  const handleLogin = async () => {
+    loginWithGithub()
+      .then((result) => {
+        const user = result.user;
+        setUser(user);
+        console.log("Login successful:", user);
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+      });
+  };
   return (
     <>
       <AppLayout>
       <section>
         <img src="/cr7.jpeg" alt="Logo" />
         <h1>SERGIDEV</h1>
-        <Button>
+        {
+           !user? <Button onClick={handleLogin}>
           <Github fill={"white"} width={24} height={24}/>
           Login with Github
         </Button>
+        :
+        <div>
+          <img src={user.photoURL} alt="User Avatar" />
+          <h2>Welcome, {user.displayName}</h2>
+          
+        </div>
+        }
+        
       </section>
       </AppLayout>
 
