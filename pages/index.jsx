@@ -1,24 +1,29 @@
 import Head from "next/head";
 import Link from "next/link";
-import AppLayout from "../Components/AppLayout/AppLayout";
-import { colors } from "../styles/theme";
-import Button from "../Components/Button";
-import Github from "../Components/Icons/Github";
+import AppLayout from "Components/AppLayout/AppLayout";
+import { colors } from "styles/theme";
+import Button from "Components/Button";
+import Github from "Components/Icons/Github";
 
 import { loginWithGithub, onAuthStateChangedOwn } from "../firebase/client";
 import { useEffect, useState } from "react";
 import { on } from "events";
+import Avatar from "../Components/Avatar";
+import { useRouter } from "next/router";
+import useUser, {USER_STATES} from "../hooks/useUser";
 export default function Home() {
-  const [user, setUser] = useState(null);
+  const user = useUser();
+  const router = useRouter();
+
 
   useEffect(() => {
-    onAuthStateChangedOwn(setUser)
-  }, []);
+    user && router.replace("/home");
+  }, [user]);
+
   const handleLogin = async () => {
     loginWithGithub()
       .then((result) => {
         const user = result.user;
-        setUser(user);
         console.log("Login successful:", user);
       })
       .catch((error) => {
@@ -29,17 +34,20 @@ export default function Home() {
     <>
       <AppLayout>
       <section>
-        <img src="/cr7.jpeg" alt="Logo" />
+        <img className="logo" src="/cr7.jpeg" alt="Logo" />
         <h1>SERGIDEV</h1>
         {
-           !user? <Button onClick={handleLogin}>
+  user === USER_STATES.CHECKING_STATUS && <img className="loading gif" src={"/spinner.gif"} alt="Loading..." />
+}
+        {
+           user === USER_STATES.NOT_LOGGED_IN && <Button onClick={handleLogin}>
           <Github fill={"white"} width={24} height={24}/>
           Login with Github
         </Button>
-        :
-        <div>
-          <img src={user.photoURL} alt="User Avatar" />
-          <h2>Welcome, {user.displayName}</h2>
+}
+
+{       user && <div>
+        <Avatar src={user.photoURL} alt={user.displayName} text={user.displayName} withText={true}/>
           
         </div>
         }
@@ -48,7 +56,7 @@ export default function Home() {
       </AppLayout>
 
       <style jsx>{`
-        img {
+        .logo{
           width: 120px;
           height: auto;
           max-width: 600px;
@@ -58,6 +66,7 @@ export default function Home() {
           border-radius: 10px;
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         h1{
           color: ${colors.primary};
           font-weight: 800;
